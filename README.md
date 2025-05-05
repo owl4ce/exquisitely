@@ -22,7 +22,7 @@ It is suggested to use [Ventoy](https://www.ventoy.net/en/doc_news.html) if you 
 
 > Ensure to **disable** Secure Boot on firmware settings. In this page, UEFI system is used.
 
-Open boot menu by pressing a key during POST and point to your installation media, or set the firmware's boot priority/order. Refer to your Vendor for details. On GRUB menu, optionally configure according to your needs and select "From CD/DVD/ISO: artix.x86_64". Login as root.
+Open boot menu by pressing a key during POST and point to your installation media, or set the firmware's boot priority/menu. Refer to your Vendor for details. On GRUB menu, optionally configure according to your needs and select "From CD/DVD/ISO: artix.x86_64". Login as root.
 
 ### 1.4 Connect to the internet
 
@@ -107,7 +107,7 @@ mkfs.f2fs -l 'Artix Linux' -O extra_attr,inode_checksum,flexible_inline_xattr,in
 
 If you created an EFI system partition, format it to FAT32.
 
-> ESP must not be formatted if you **already** use other OS such as dual-booting Microsoft Windows. Resizing ESP on GPT system as suggested size requires advanced effort. 
+> ESP must not be formatted if you **already** use other OS such as dual-booting Microsoft Windows. Resizing ESP on GPT system as suggested size requires advanced effort; [AOMEI Partition Assistant](https://www.diskpart.com/) is suggested over any tools.
 
 ```sh
 mkfs.fat -F 32 /dev/nvme0n1p1
@@ -139,7 +139,7 @@ basestrap /mnt/ base base-devel openrc elogind-openrc
 
 ### 2.2 Linux kernel
 
-There are three kernels Artix provides: linux, linux-lts, and linux-zen. In this page, linux-zen is suggested for balanced optimization and linux-firmware for compability fixes.
+There are three kernels Artix provides: linux, linux-lts, and linux-zen. In this page, linux-zen is preferred for balanced optimization and linux-firmware for compability fixes.
 
 ```sh
 basetrap /mnt/ linux-zen linux-firmware
@@ -164,7 +164,7 @@ blkid >> /mnt/etc/fstab
 Check the resulting `/mnt/etc/fstab` file, and edit it in case of errors. 
 
 ```sh
-$EDITOR /mnt/etc/fstab
+${EDITOR:-nano} /mnt/etc/fstab
 ``` 
 
 #### 3.1.1 File system table
@@ -189,6 +189,216 @@ Change root into the new Artix system.
 
 ```sh
 artix-chroot /mnt/
+```
+
+### 3.3 Time
+
+Set the time zone.
+
+```sh
+ln -sf /usr/share/zoneinfo/YOUR_REGION/YOUR_CITY /etc/localtime
+```
+
+Run hwclock to synchronize RTC from system local time.
+
+```sh
+hwclock --systohc
+```
+
+> If you are dual-booting Microsoft Windows, use `RealTimeIsUniversal` registry tweak to assume RTC is UTC in Windows system (as Linux system does).
+
+### 3.4 Localization
+
+Install a text editor of your choice
+
+```sh
+pacman -S nano vim
+```
+
+and uncomment the locales such as `en_US.UTF-8 UTF-8` in `/etc/locale.gen` as your desire.
+
+```sh
+nano /etc/locale.gen
+```
+
+Generate the locales.
+
+```sh
+locale-gen
+```
+
+Set the systemwide locale by exporting LANG environment variable.
+
+```sh
+echo 'export LANG=en_US.UTF-8' > /etc/locale.conf
+```
+
+### 3.5 Network configuration
+
+Create and set the hostname file.
+
+```sh
+echo 'YOUR_HOSTNAME' > /etc/hostname
+```
+
+Match the hosts file.
+
+```sh
+cat >> /etc/hosts << "EOL"
+127.0.0.1	localhost
+::1			localhost
+127.0.1.1	YOUR_HOSTNAME.localdomain	YOUR_HOSTNAME
+EOL
+```
+
+> If your system has a permanent IP address, it should be used instead of 127.0.1.1.
+
+If you want to use DHCP configuration, install a DHCP client and for wireless connection too. Iwd and dhcpcd is preferred as its simplicity.
+
+```sh
+pacman -S dhcpcd dhcpcd-openrc iwd iwd-openrc
+```
+
+Add dhcpcd and iwd OpenRC service to default runlevel.
+
+```sh
+rc-update add dhcpcd iwd default
+```
+
+### 3.6 Initramfs
+
+#### 3.6.1 Essential settings
+
+Edit the mkinitcpio configuration to debloat unneeded features in initial RAM file system.
+
+```sh
+nano /etc/mkinitpio.conf
+```
+
+##### 3.6.1.1 HOOKS
+
+The HOOKS control modules and scripts added into initramfs image, and here is the essential to include.
+
+```
+...
+
+HOOKS=(base udev autodetect microcode modconf kms block filesystems)
+
+...
+```
+
+##### 3.6.1.2 COMPRESSION
+
+For balanced optimization between decompression speed and size, set the initramfs image COMPRESSION algorithm to LZ4.
+
+```
+...
+
+COMPRESSION="lz4"
+
+...
+```
+
+#### 3.6.2 Essential presets
+
+Remove and uncomment unneeded fallback preset from linux-zen mkinitcpio preset file.
+
+```sh
+nano /etc/mkinitcpio.d/linux-zen.preset
+```
+
+The configuration should looks like this.
+
+```
+# mkinitcpio preset file for the 'linux-zen' package
+
+#ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-zen"
+
+PRESETS=('default')
+
+#default_config="/etc/mkinitcpio.conf"
+default_image="/boot/initramfs-linux-zen.img"
+#default_uki="/efi/EFI/Linux/arch-linux-zen.efi"
+#default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
+
+#fallback_config="/etc/mkinitcpio.conf"
+#fallback_image="/boot/initramfs-linux-zen-fallback.img"
+#fallback_uki="/efi/EFI/Linux/arch-linux-zen-fallback.efi"
+#fallback_options="-S autodetect"
+```
+
+#### 3.6.3 Image recreation
+
+After unneeded settings have been debloated, recreate the initramfs image.
+
+```sh
+mkinitcpio -P
+```
+
+### 3.7 Bootloader(-less)
+
+Unified Extensible Firmware Interface (UEFI) is designed to remove the need for an intermediate bootloader. Thus, Linux kernel is a valid EFI executable which can be directly launched from UEFI (boot menu). Firstly, install efibootmgr that will be used to interact with UEFI NVRAM.
+
+```sh
+pacman -S efivar efibootmgr
+```
+
+Create a respective boot entry to all configurations.
+
+```sh
+efibootmgr -c -d /dev/nvme0n1 -p 1 -L 'Artix Linux-Zen' -l /vmlinuz-linux-zen -u 'root=PARTUUID=a8d18ea3-a488-4362-bbe1-92f6e821689d rw rootflags=atgc,age_extent_cache,flush_merge,compress_cache loglevel=3 initrd=\initramfs-linux-zen.img'
+```
+
+## 4. System administration
+
+### 4.1 Users and groups
+
+Set the privileged user (root) password before creating unprivileged user account.
+
+```sh
+passwd
+```
+
+Unprivileged user is general and secure for most tasks. Create an user and add it to wheel group to performs partial administrative actions.
+
+```sh
+useradd -m -G wheel YOUR_USER
+```
+
+Set the unprivileged user password.
+
+```sh
+passwd YOUR_USER
+```
+
+### 4.2 Privilege elevation
+
+#### 4.2.1 Sudo
+
+Allow users of group wheel to execute command as another user such as root.
+
+```sh
+EDITOR=nano visudo
+```
+
+Uncomment below line containing ALL belongs to %wheel group.
+
+```
+...
+
+## Uncomment to allow members of group wheel to execute any command
+%wheel ALL=(ALL:ALL) ALL
+
+...
+```
+
+#### 4.2.2 Doas
+
+Alternative to sudo, install opendoas if you are familiar with OpenBSD doas.
+
+```sh
+pacman -S opendoas
 ```
 
 <br>...<br>
