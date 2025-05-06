@@ -246,7 +246,7 @@ Match the hosts file.
 ```sh
 cat >> /etc/hosts << "EOL"
 127.0.0.1	localhost
-::1			localhost
+::1	localhost
 127.0.1.1	YOUR_HOSTNAME.localdomain	YOUR_HOSTNAME
 EOL
 ```
@@ -289,7 +289,7 @@ HOOKS=(base udev autodetect microcode modconf kms block filesystems)
 
 ##### 3.6.1.2 COMPRESSION
 
-For balanced optimization between decompression speed and size, set the initramfs image COMPRESSION algorithm to LZ4.
+For balanced optimization between decompression speed and size, set the COMPRESSION algorithm to LZ4.
 
 ```
 ...
@@ -401,7 +401,83 @@ Alternative to sudo, install opendoas if you are familiar with OpenBSD doas.
 pacman -S opendoas
 ```
 
-<br>...<br>
+Create a configuration file to allow users of group wheel to execute command as another user such as root.
+
+```sh
+echo 'permit persist setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :wheel' > /etc/doas.conf
+```
+
+Ensure the owner and group of `/etc/doas.conf` file should both be 0 (root)
+
+```sh
+chown -c root:root /etc/doas.conf
+```
+
+and file permissions should be secured to 0400.
+
+```sh
+chmod -c 0400 /etc/doas.conf
+```
+
+#### 4.2.3 Polkit
+
+Polkit is used to control systemwide privileges. It provides an organized way for non-privileged processes to communicate with privileged ones. It does not grant as another user such as root to an entire process, but rather allows a finer level of control of centralized system policy. Hence, install polkit for sane environment.
+
+```sh
+pacman -S polkit
+```
+
+## 5. Package management
+
+### 5.1 Repositories
+
+Enable Arch repositories to cover packages that not yet available in Artix repositories. Install artix-archlinux-support
+
+``sh
+pacman -S artix-archlinux-support
+```
+
+and append extra repositories to pacman configuration file.
+
+```sh
+cat >> /etc/pacman.conf << "EOL"
+
+[extra]
+Include = /etc/pacman.d/mirrorlist-arch
+EOL
+```
+
+Populate the pacman key.
+
+```sh
+pacman-key --populate archlinux
+```
+
+Performs system upgrade.
+
+```sh
+pacman -Syu
+```
+
+## 6. Reboot
+
+Exit the chroot environment or press Ctrl+d.
+
+```sh
+exit
+```
+
+Unmount all mounted partitions.
+
+```sh
+umount -R /mnt/
+```
+
+Reboot the live system and boot to "Artix Linux-Zen".
+
+```sh
+reboot
+```
 
 ```
 Compiled and written by owl4ce.
