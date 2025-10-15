@@ -20,7 +20,7 @@ input is used to "cheat" slow keyboard and trackpad input when selecting graphic
 
 ## Keyboard and Trackpad
 
-<img align="center" width="96%" src="../src-images/lty11e6g-stock-keyboard-trackpad-owl4ce.webp"/>
+<img align="center" width="100%" src="../src-images/lty11e6g-stock-keyboard-trackpad-owl4ce.webp"/>
 
 The built-in keyboard and trackpad is well done, but sad to see no media keys there. Nonetheless, we can remap the keys
 by software later. The trackpad's surface is quite soft and sweet to touch and swipe on. There is no useless trackpoint.
@@ -43,7 +43,7 @@ which is genius.
 
 ## Cooling System
 
-<img align="center" width="96%" src="../src-images/lty11e6g-cooling-mod-owl4ce.webp"/>
+<img align="center" width="100%" src="../src-images/lty11e6g-cooling-mod-owl4ce.webp"/>
 
 As uses Intel Core Y-series processor as default configuration, the TDP is approximately about 5 watt. It produces less
 heat, therefore uses passive cooling system. However, it **would be nice if we modify** the built-in cooling plate by

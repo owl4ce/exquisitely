@@ -46,13 +46,13 @@ KINGDIAN SATA3 SSD, and now installed onto.
 
 ## Cooling System
 
-<img align="center" width="96%" src="../src-images/ltm715q2g-specs-inside-owl4ce.webp"/>
+<img align="center" width="100%" src="../src-images/ltm715q2g-specs-inside-owl4ce.webp"/>
 
 Ensure to clean the old thermal paste and repaste with high conductivity thermal paste.
 
 ## Audio and Speakers
 
-<img align="center" width="96%" src="../src-images/ltm715q2g-speaker-mod-owl4ce.webp"/>
+<img align="center" width="100%" src="../src-images/ltm715q2g-speaker-mod-owl4ce.webp"/>
 
 The built-in single speaker is too small, producing only hi-frequency tones. Mid-range frequencies are lost due to its
 design. Therefore, it **would be good to add** an additional old speaker. I take the left speaker from broken Lenovo
