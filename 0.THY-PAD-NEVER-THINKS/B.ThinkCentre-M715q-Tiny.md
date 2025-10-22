@@ -3,7 +3,7 @@ Lenovo (ThinkCentre) M715q Tiny 2nd Gen (2021)
 
 Artix Linux-Zen
 
-AMD Ryzen™ 5 2400GE with 16GB x2 DDR4-3000 OC
+AMD Ryzen™ 5 2400GE with 16GB x2 DDR4-3000 OC'ed
 22" Frameless FHD IPS HP Monitor via DisplayPort
 1.5+2W Dual Mono Speakers Realtek® ALC233VB2
 ```
@@ -16,7 +16,7 @@ depending on our RAM and SSD choices. Moreover, this machine is overclock-able t
 ## AC Adapter
 
 The original AC adapter was 65W, but using 90W (or higher) AC adapter significantly improve the overall performance due
-to the higher ampere availability.
+to the higher ampere availability if required on heavy load.
 
 ## Display Screen
 
@@ -39,16 +39,22 @@ and currently only rely on the built-in omnidirectional WiFi antenna that connec
 ## RAM and SSD Storage
 
 According to the Lenovo Product Specifications Reference (psref), installed RAM supports up to 32GB DDR4-2666. Although
-the APU itself may supports up to 64GB DDR4-3200 or natively 2933MT/s, this is totally untested or may be limited by the
-chipset. To get optimal performance-vs-cost trade, I have spent extra $75 to buy (aged stock) DDR4 SODIMM 32GB KINGSTON
-FURY KIT 2666MT/s CL15-17-17 and an used 512GB WD 2280 NVMe PCIe 3 SSD with 99% health. I also have a new unused 512GB
-KINGDIAN SATA3 SSD, and now installed onto.
+the APU itself may supports up to 64GB DDR4-3200 or officially 2933MT/s, this is totally untested or may be limited by
+the chipset. To get optimal performance-vs-cost trade, I have spent extra $75 to buy (aged stock) DDR4 SODIMM 32GB
+KINGSTON FURY KIT 2666MT/s CL15-17-17 and an used 512GB WD 2280 NVMe PCIe 3 SSD with 99% health. I also have a new
+unused 512GB KINGDIAN SATA3 SSD, and now optimally installed onto.
+
+> Using Smokeless_UMAF, we cannot overclock the RAM above 3000MT/s, there is tolerance for 1533Mhz per channel for this
+chipset, but it is unstable. The higher frequencies will be ignored, and UEFI stick with default thus safe configuration
+for good. Overclocking the iGPU also causes failure to wake up from sleep/suspend mode.
 
 ## Cooling System
 
 <img align="center" width="100%" src="../src-images/ltm715q2g-specs-inside-owl4ce.webp"/>
 
-Ensure to clean the old thermal paste and repaste with high conductivity thermal paste.
+Ensure to clean the old thermal paste and repaste with high conductivity thermal paste. Additionally on this OC'ed
+machine, I have also modified the SATA-bracket to house a 5V laptop fan (by directing current from one of safe USB
+lines), also prop the gap between NVMe SSD with a thick thermal pad touches the bottom side of SATA-bracket.
 
 ## Audio and Speakers
 
