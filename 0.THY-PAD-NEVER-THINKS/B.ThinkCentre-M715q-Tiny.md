@@ -53,8 +53,8 @@ for good. Overclocking the iGPU also causes failure to wake up from sleep/suspen
 <img align="center" width="100%" src="../src-images/ltm715q2g-specs-inside-owl4ce.webp"/>
 
 Ensure to clean the old thermal paste and repaste with high conductivity thermal paste. Additionally on this OC'ed
-machine, I have also modified the SATA-bracket to house a 5V laptop fan (by directing current from one of safe USB
-lines), also prop the gap between NVMe SSD with a thick thermal pad touches the bottom side of SATA-bracket.
+machine, I have also modified the SATA-bracket to house a HP-14-compatible fan (by connecting to one of safe +5V .5A
+VBUS), also prop the gap between NVMe SSD with a thick thermal pad touches the bottom side of SATA-bracket.
 
 ## Audio and Speakers
 
